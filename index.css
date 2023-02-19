@@ -1,0 +1,63 @@
+:root {
+	--spacing: 16px;
+}
+
+html, body {
+	background-color: #ff0082;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+#main-canvas {
+	width: 100%;
+	height: 100%;
+}
+
+#trash-can {
+	--length: 64px;
+	--active-length: 64px;
+	--highlight-distance: 256px;
+
+	z-index: 100;
+
+	position: fixed;
+	bottom: calc((var(--length) + var(--spacing)) * -1);
+	right: 0;
+	margin-right: 0;
+	margin-right: var(--spacing);
+	margin-bottom: var(--spacing);
+	width: var(--length);
+	height: var(--length);
+
+	pointer-events: none;
+
+	transition: bottom 0.5s ease, width 0.5s ease, height 0.5s ease;
+}
+
+#trash-can > img {
+	width: 100%;
+	height: 100%;
+}
+
+#trash-can.highlighted {
+	bottom: 0;
+}
+
+#trash-can.active {
+	width: var(--active-length);
+	height: var(--active-length);
+}
+
+#credits {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	font-size: small;
+	font-family: sans-serif;
+	padding: 0.5em;
+}
+
+#credits a:any-link {
+	color: inherit;
+}
