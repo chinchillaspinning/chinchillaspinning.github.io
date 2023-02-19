@@ -82,11 +82,11 @@ mtlLoader
 				scene.add(chinchilla);
 			},
 			null,
-			err => console.error(err)
+			err => console.error(`Object Load Error: ${err}`)
 		)
 	},
 	null,
-	err => console.error(err)
+	err => console.error(`Material Load Error: ${err}`)
 )
 
 camera.position.z = 5;
