@@ -18,8 +18,6 @@ const chinchillaModelScale = 0.5;
 const canvas = document.getElementById("main-canvas");
 const trashCan = document.getElementById("trash-can");
 
-trashCan.addEventListener("mouseover", () => {console.log("HI")});
-
 const FOV = 75;
 const clock = new THREE.Clock(true);
 
@@ -64,8 +62,6 @@ mtlLoader
 	chinchillaMaterialPath,
 	materials => {
 		materials.preload();
-		console.log(materials);
-
 		objLoader
 			.setMaterials(materials)
 			.load(chinchillaModelPath,
@@ -244,7 +240,6 @@ canvas.addEventListener("pointermove", event => {
 	if(draggingChinchilla){
 		const trashCanDistance = new Vector2(1, -1).sub(pointer).length();
 		const trashCanDisplacementPx = new Vector2(canvas.clientWidth, canvas.clientHeight).sub(pointerPx);
-		console.log(trashCanDisplacementPx);
 		if(trashCanDisplacementPx.length() < trashCanHighlightDistance){
 			trashCan.classList.add("highlighted");
 		}
