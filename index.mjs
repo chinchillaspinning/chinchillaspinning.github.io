@@ -2,16 +2,18 @@ import * as THREE from "./three.mjs";
 import { Vector2, Vector3 } from "./three.mjs";
 import { OBJLoader } from "./loader/OBJLoader.mjs";
 import { MTLLoader } from "./loader/MTLLoader.mjs"
+import { GLTFLoader } from "./loader/GLTFLoader.mjs";
+
 import { lerp, lerpClamped } from "./util.mjs";
 
 const modelBasePath = "models"
 const chinchillaModelPath = "chinchilla.obj"
 const chinchillaMaterialPath = "chinchilla.mtl"
 
-const defaultChinchillaRotation = 3*Math.PI / 4;
+const defaultChinchillaRotation = Math.PI/4;
 // const defaultChinchillaRotation = 0;
 const chinchillaOffset = new Vector3(
-	-0.5, -0.5, -0.25
+	-1.5, -0.5, -0.5
 );
 const chinchillaModelScale = 0.5;
 
@@ -25,13 +27,7 @@ const renderer = new THREE.WebGLRenderer({
 	canvas: canvas,
 	alpha: true,
 });
-
-const objLoader = new OBJLoader();
-objLoader.setPath("/models/")
-
-const mtlLoader = new MTLLoader();
-mtlLoader.setResourcePath("/models/");
-mtlLoader.setPath("/models/");
+renderer.outputEncoding = THREE.sRGBEncoding;
 
 const scene = new THREE.Scene();
 scene.add(new THREE.DirectionalLight(0x404040, 0.5));
@@ -57,37 +53,67 @@ let camera
 /** @type {THREE.Group | null} */
 let chinchilla = null;
 let chinchillaModel = null;
-mtlLoader
+
+// new MTLLoader()
+// 	.setPath("/models/")
+// 	.load(
+// 	chinchillaMaterialPath,
+// 	materials => {
+// 		materials.preload();
+// 		new OBJLoader()
+// 			.setPath("/models/")
+// 			.setMaterials(materials)
+// 			.load(chinchillaModelPath,
+// 			/**
+// 			 *
+// 			 * @param {THREE.Group} obj
+// 			 */
+// 			obj => {
+// 				obj.position.add(chinchillaOffset);
+// 				obj.scale.fromArray(new Array(3).fill(chinchillaModelScale))
+
+// 				chinchilla = new THREE.Group();
+// 				chinchillaModel = new THREE.Group();
+
+// 				chinchillaModel.add(obj);
+// 				chinchillaModel.rotateOnAxis(new Vector3(0, 1, 0), defaultChinchillaRotation);
+// 				chinchilla.add(chinchillaModel)
+// 				scene.add(chinchilla);
+// 			},
+// 			null,
+// 			err => console.error(`Object Load Error: ${err}`)
+// 		)
+// 	},
+// 	null,
+// 	err => console.error(`Material Load Error: ${err}`)
+// )
+
+new GLTFLoader()
+	.setPath("/models/")
 	.load(
-	chinchillaMaterialPath,
-	materials => {
-		materials.preload();
-		objLoader
-			.setMaterials(materials)
-			.load(chinchillaModelPath,
-			/**
-			 *
-			 * @param {THREE.Group} obj
-			 */
-			obj => {
-				obj.position.add(chinchillaOffset);
-				obj.scale.fromArray(new Array(3).fill(chinchillaModelScale))
+		"chinchilla.gltf",
+		gltf => {
+			chinchilla = new THREE.Group();
+			chinchillaModel = new THREE.Group();
 
-				chinchilla = new THREE.Group();
-				chinchillaModel = new THREE.Group();
+			for(let child of gltf.scene.children){
+				if(child.type === "Group"){
+					child.scale.fromArray(new Array(3).fill(chinchillaModelScale));
+					child.position.add(chinchillaOffset);
+					chinchillaModel.add(child)
+				}
+				else{
+					scene.add(child);
+				}
+			}
 
-				chinchillaModel.add(obj);
-				chinchillaModel.rotateOnAxis(new Vector3(0, 1, 0), defaultChinchillaRotation);
-				chinchilla.add(chinchillaModel)
-				scene.add(chinchilla);
-			},
-			null,
-			err => console.error(`Object Load Error: ${err}`)
-		)
-	},
-	null,
-	err => console.error(`Material Load Error: ${err}`)
-)
+			chinchillaModel.rotateOnAxis(new Vector3(0, 1, 0), defaultChinchillaRotation);
+
+			chinchilla.add(chinchillaModel)
+			scene.add(chinchilla);
+		}
+	)
+
 
 camera.position.z = 5;
 
@@ -346,10 +372,10 @@ canvas.addEventListener("mouseup", event => {
 function onWindowResize(){
 	const trashCanStyle = window.getComputedStyle(trashCan);
 
-	const lengthStr = trashCanStyle.getPropertyValue("--length");
-	const activeLengthStr = trashCanStyle.getPropertyValue("--active-length");
-	const highlightDistanceStr = trashCanStyle.getPropertyValue("--highlight-distance");
-	const marginStr = trashCanStyle.getPropertyValue("--spacing");
+	const lengthStr = trashCanStyle.getPropertyValue("--length").trim();
+	const activeLengthStr = trashCanStyle.getPropertyValue("--active-length").trim();
+	const highlightDistanceStr = trashCanStyle.getPropertyValue("--highlight-distance").trim();
+	const marginStr = trashCanStyle.getPropertyValue("--spacing").trim();
 
 	const pxRegEx = /^(\d+)px$/;
 
